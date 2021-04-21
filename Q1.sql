@@ -1,12 +1,12 @@
 DROP PROCEDURE myProcedure;
 
---PROCEDURE
+-- PROCEDURE
 DELIMITER $$
 CREATE PROCEDURE `myProcedure`(IN userID varchar(5))
 BEGIN
 
 
-
+-- QUERY
 (SELECT
 	OrderID,
         case
@@ -32,4 +32,10 @@ ORDER BY cast(Amount AS signed));
 
 END $$
 DELIMITER ;
-CALL myProcedure("VINET");
+
+
+
+-- SET PARAM TO FUNTION
+
+set @param = "VINET";
+CALL myProcedure(@param);
