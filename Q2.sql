@@ -5,41 +5,16 @@ BEFORE DELETE
 ON orders
 FOR EACH ROW
 BEGIN
-	DELETE FROM `order detalis` o Where orderID = OLD.orderID;
-	UPDATE products SET UnitsInStock = o.OLD.Quantity + UnitsInStock WHERE productID = o.OLD.productID;
 
+UPDATE products SET products.UnitsInStock = products.UnitsInStock + 
+		(SELECT o.Quantity FROM `order details` o WHERE (o.orderID = OLD.orderID AND products.productID = o.productID));
+DELETE FROM `order details` Where orderID = OLD.orderID;
+	
 END $$
 DELIMITER ;
 
+SET FOREIGN_KEY_CHECKS = 0;
+DELETE FROM orders
+where OrderID=10257;
+SET FOREIGN_KEY_CHECKS = 1;
 
-
-
-DROP TRIGGER afterDelOrder;
-DELIMITER $$
-CREATE TRIGGER afterDelOrder
-BEFORE DELETE
-ON orders
-FOR EACH ROW
-BEGIN
-	DELETE FROM `order detalis` od Where orderID = OLD.orderID;
-	UPDATE products SET UnitsInStock = UnitsInStock + 
-		(SELECT Quantity FROM `order details` o WHERE o.productID = od.productID AND OrderID = OLD.OrderID)  
-		WHERE productID = od.productID;
-END $$
-DELIMITER ;
-
-
-
-DROP TRIGGER afterDelOrder;
-DELIMITER $$
-CREATE TRIGGER afterDelOrder
-BEFORE DELETE
-ON orders
-FOR EACH ROW
-BEGIN
-	DELETE FROM `order detalis` Where orderID = OLD.orderID;
-	UPDATE products SET UnitsInStock = UnitsInStock + 
-		(SELECT Quantity FROM `order details` o WHERE o.productID = od.productID AND OrderID = OLD.OrderID)  
-		WHERE productID = (SELECT productID FROM `order detalis` WHERE orderID = OLD.orderID);
-END $$
-DELIMITER ;
